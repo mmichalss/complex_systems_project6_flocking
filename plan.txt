@@ -1,0 +1,7 @@
+----BIRD FLOCKING MODEL----
+---------------------------
+
+1. create bodies with positions +
+2. give each velocity +
+3. place them inside a box +
+4. implement 3 simple rules +
