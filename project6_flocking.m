@@ -1,19 +1,19 @@
 % project 6 - Flocking simulation
 
 T = 400;
-borders = [0 10 0 10];
-v_limits = [0.1 0.3];
-N = 10;
+borders = [0 100 0 100];
+v_limits = [3 7];
+N = 40;
 %P = [2 2; 2.2 2; 1.2 1.3];
 %V = -1.*[0.1 0.11; 0.11 0.1; 0.1 0];
-P = [randd(borders(1), borders(2), N);randd(borders(1), borders(2), N)]';
-V = [randd(v_limits(1), v_limits(2), N);randd(v_limits(1), v_limits(2), N)]';
-line_of_sight = 2;
-min_distance = 0.1;
+P = [randd(borders(1), borders(2), N, false);randd(borders(1), borders(2), N, false)]';
+V = [randd(v_limits(1), v_limits(2), N, true);randd(v_limits(1), v_limits(2), N, true)]';
+line_of_sight = 10;
+min_distance = 1;
 figure;
 plot_bodies(P,V,T,borders,line_of_sight,min_distance);
 
-function random_doubles = randd(a, b, length)
+function random_doubles = randd(a, b, length, negative)
     % a: lower bound of the range
     % b: upper bound of the range
     % length: number of random doubles to generate
@@ -23,6 +23,14 @@ function random_doubles = randd(a, b, length)
     
     % Round to one decimal place
     random_doubles = round(random_doubles, 1);
+    
+    if negative
+        % Generate random signs (-1 or 1) with 50% chance for each
+        signs = randi([0, 1], 1, length) * 2 - 1;
+        
+        % Apply the random signs to the random doubles
+        random_doubles = random_doubles .* signs;
+    end
 end
 
 function plot_bodies(P,V,T,borders,line_of_sight,min_distance)
@@ -81,7 +89,7 @@ end
 
 function [new_position, new_velocity] = border_collision(position,velocity,borders)
     borders_diagonal = sqrt(2)*abs(borders(1)-borders(2)); % assuming a square
-    line = -borders_diagonal*velocity*3 + position;
+    line = -borders_diagonal*velocity*2 + position;
     [new_position, new_velocity]= find_intersection(position,line,borders,velocity);
 end
 
@@ -111,7 +119,7 @@ function [new_P, new_V]= next_move(P,V,borders,line_of_sight,min_distance)
 end
 
 function [new_position, new_velocity] = find_intersection(p1, p2, borders, velocity)
-    % p1, p2: points on the first line [x1, y1] (particle) [x2, y2] (line end)
+    % p1, p2: points on the line (line start) [x1, y1] (particle) [x2, y2] (line end)
     % borders: coordinates of the border
     % velocity: velocity of the boid
 
